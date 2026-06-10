@@ -99,39 +99,10 @@ log "Step 5: Installing HuggingFace Hub CLI..."
 
 pip install huggingface_hub --proxy $HTTP_PROXY
 
-# -------------------------------------------------------
-# STEP 6 - Download the model
-# -------------------------------------------------------
-log "Step 6: Downloading model $MODEL from HuggingFace..."
-
-if [ -n "$HF_TOKEN" ]; then
-  export HUGGING_FACE_HUB_TOKEN=$HF_TOKEN
-  hf login --token "$HF_TOKEN" --add-to-git-credential
-fi
-
-hf download "$MODEL"
-
-log "Model downloaded."
-
-# -------------------------------------------------------
-# STEP 7 - Test vLLM server manually
-# -------------------------------------------------------
-log "Step 7: Starting vLLM server on port $PORT for testing..."
-log "This will run in the foreground. Press Ctrl+C to stop."
-echo ""
-warn "Watch for the line: INFO: Uvicorn running on http://0.0.0.0:$PORT"
-warn "Then open a second terminal and run:"
-echo ""
-echo "    curl http://localhost:$PORT/v1/models"
-echo ""
-
-# Remove proxy for running the server (not needed at runtime)
 unset HTTP_PROXY
 unset HTTPS_PROXY
 unset http_proxy
 unset https_proxy
 
-python -m vllm.entrypoints.openai.api_server \
-  --model "$MODEL" \
-  --host 0.0.0.0 \
-  --port "$PORT"
+vllm serve "Qwen/Qwen3-32B"
+
