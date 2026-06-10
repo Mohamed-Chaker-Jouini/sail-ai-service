@@ -106,10 +106,10 @@ log "Step 6: Downloading model $MODEL from HuggingFace..."
 
 if [ -n "$HF_TOKEN" ]; then
   export HUGGING_FACE_HUB_TOKEN=$HF_TOKEN
-  huggingface-cli login --token "$HF_TOKEN" --add-to-git-credential
+  hf login --token "$HF_TOKEN" --add-to-git-credential
 fi
 
-huggingface-cli download "$MODEL"
+hf download "$MODEL"
 
 log "Model downloaded."
 
