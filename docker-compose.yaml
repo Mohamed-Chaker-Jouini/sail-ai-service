@@ -28,7 +28,7 @@ services:
       - HF_HUB_OFFLINE=1                      # ← no network calls at all
       - TRANSFORMERS_OFFLINE=1                 # ← same for transformers
     volumes:
-      - ~/.cache/huggingface/hub/Qwen3-32B:/model  # ← local model, no download
+      - /home/ai/.cache/huggingface/hub/Qwen3-32B:/model  # ← local model, no download
     deploy:
       resources:
         reservations:
