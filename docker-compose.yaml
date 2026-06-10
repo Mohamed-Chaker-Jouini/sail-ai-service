@@ -1,16 +1,45 @@
 services:
+  # ---- Your Custom API Service ----
   api:
     build:
       context: .
       args:
         HTTP_PROXY: "http://10.93.144.53:8080"
-        HTTPS_PROXY: "http://10.93.144.53:8080"
+        String: "http://10.93.144.53:8080"
     container_name: sail-ai-api
     ports:
       - "8000:8000"
     environment:
-      LLM_BASE_URL: http://host.docker.internal:8001
+      # Direct container-to-container networking
+      LLM_BASE_URL: http://vllm:8001/v1
       LLM_MODEL: Qwen/Qwen3-32B-Instruct
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      - vllm
     restart: unless-stopped
+
+  # ---- vLLM Inference Service ----
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: vllm-server
+    restart: unless-stopped
+    ports:
+      - "8001:8001" # Maps port 8001 on the host to 8001 in the container
+    ipc: host 
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
+      - HTTP_PROXY="http://10.93.144.53:8080"
+      - HTTPS_PROXY="http://10.93.144.53:8080"
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Match the port to 8001 as required by your API setup
+    command: >
+      --model "Qwen/Qwen3-32B-Instruct"
+      --port 8001
+      --max-model-len 4096
