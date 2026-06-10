@@ -8,7 +8,7 @@ from prompting import build_messages
 
 
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "http://127.0.0.1:8001")
-LLM_MODEL = os.getenv("LLM_MODEL", "Qwen/Qwen3-32B-Instruct")
+LLM_MODEL = os.getenv("LLM_MODEL", "Qwen/Qwen3-32B")
 
 
 def health_info() -> Dict[str, Any]:
