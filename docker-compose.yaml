@@ -2,17 +2,12 @@ services:
 
   vllm:
     image: vllm/vllm-openai:latest
-
     container_name: sail-vllm
-
     runtime: nvidia
-
     ports:
       - "8001:8001"
-
     environment:
       HUGGING_FACE_HUB_TOKEN: ""
-
     command:
       - --model
       - Qwen/Qwen3-32B-Instruct
@@ -20,25 +15,32 @@ services:
       - 0.0.0.0
       - --port
       - "8001"
-
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
-
+    networks:
+      - internal
     restart: unless-stopped
 
   api:
-    build: .
-
+    build:
+      context: .
+      args:
+        HTTP_PROXY: "http://10.93.144.53:8080"
+        HTTPS_PROXY: "http://10.93.144.53:8080"
     container_name: sail-ai-api
-
     depends_on:
       - vllm
-
     ports:
       - "8000:8000"
-
     environment:
       LLM_BASE_URL: http://vllm:8001
       LLM_MODEL: Qwen/Qwen3-32B-Instruct
-
+    networks:
+      - internal
     restart: unless-stopped
+
+networks:
+  internal:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
