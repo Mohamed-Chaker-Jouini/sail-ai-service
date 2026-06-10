@@ -1,5 +1,4 @@
 services:
-  # ---- Your Custom API Service ----
   api:
     build:
       context: .
@@ -11,27 +10,25 @@ services:
       - "8000:8000"
     environment:
       LLM_BASE_URL: http://vllm:8001
-      LLM_MODEL: Qwen/Qwen3-32B   # ← no -Instruct suffix
+      LLM_MODEL: Qwen/Qwen3-32B
     depends_on:
-      - vllm
+      vllm:
+        condition: service_healthy
     restart: unless-stopped
 
-  # ---- vLLM Inference Service ----
   vllm:
     image: vllm/vllm-openai:latest
     container_name: vllm-server
     restart: unless-stopped
     ipc: host
-    shm_size: 16gb                 # ← prevents shared memory OOM on large models
+    shm_size: 16gb
     ports:
       - "8001:8001"
     environment:
-      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
-      - HTTP_PROXY=http://10.93.144.53:8080
-      - HTTPS_PROXY=http://10.93.144.53:8080
-      - NO_PROXY=huggingface.co,*.huggingface.co,hf.co
+      - HF_HUB_OFFLINE=1                      # ← no network calls at all
+      - TRANSFORMERS_OFFLINE=1                 # ← same for transformers
     volumes:
-      - ~/.cache/huggingface:/root/.cache/huggingface
+      - ~/.cache/huggingface/hub/Qwen3-32B:/model  # ← local model, no download
     deploy:
       resources:
         reservations:
@@ -40,7 +37,8 @@ services:
               count: all
               capabilities: [gpu]
     command: >
-      --model Qwen/Qwen3-32B
+      --model /model
+      --served-model-name Qwen/Qwen3-32B
       --port 8001
       --max-model-len 4096
       --reasoning-parser qwen3
@@ -48,8 +46,8 @@ services:
       --tool-call-parser hermes
       --gpu-memory-utilization 0.95
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 300s           # 5 min grace period for model download+load
+      retries: 10
+      start_period: 600s
