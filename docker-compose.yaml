@@ -17,8 +17,6 @@ services:
       - "8001"
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
-    networks:
-      - internal
     restart: unless-stopped
 
   api:
@@ -35,12 +33,4 @@ services:
     environment:
       LLM_BASE_URL: http://vllm:8001
       LLM_MODEL: Qwen/Qwen3-32B-Instruct
-    networks:
-      - internal
     restart: unless-stopped
-
-networks:
-  internal:
-    driver: bridge
-    driver_opts:
-      com.docker.network.bridge.enable_ip_masquerade: "false"
