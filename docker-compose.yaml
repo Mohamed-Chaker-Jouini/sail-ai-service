@@ -27,7 +27,7 @@ services:
     restart: unless-stopped
 
   api:
-    build: ./api
+    build: .
 
     container_name: sail-ai-api
 
