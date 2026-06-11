@@ -181,11 +181,11 @@ check_model() {
 }
 
 check_compose_file() {
-  log_step "Checking docker-compose.yml"
-  if [[ ! -f "docker-compose.yml" ]]; then
-    die "docker-compose.yml not found in the current directory."
+  log_step "Checking docker-compose.yaml"
+  if [[ ! -f "docker-compose.yaml" ]]; then
+    die "docker-compose.yaml not found in the current directory."
   fi
-  log_ok "docker-compose.yml found"
+  log_ok "docker-compose.yaml found"
 }
 
 check_dockerfile() {
@@ -391,7 +391,7 @@ print_endpoints() {
 main() {
   print_banner
 
-  # Ensure we're in the project root (where docker-compose.yml lives)
+  # Ensure we're in the project root (where docker-compose.yaml lives)
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   cd "${SCRIPT_DIR}"
 

@@ -77,7 +77,7 @@ your-project/
 ├── prompting.py             # System prompt and message builder
 ├── requirements.txt         # Python dependencies
 ├── Dockerfile               # API container build
-├── docker-compose.yml       # Full stack definition (api + vllm)
+├── docker-compose.yaml       # Full stack definition (api + vllm)
 ├── .env                     # Runtime configuration (ports, model name)
 ├── run.sh                   # One-shot setup + launch script (start here)
 └── README.md
@@ -147,9 +147,9 @@ AI_API_PORT=8000                 # External port for the FastAPI service
 # HTTPS_PROXY=http://10.93.144.53:8080
 ```
 
-### vLLM Parameters (docker-compose.yml → `command:`)
+### vLLM Parameters (docker-compose.yaml → `command:`)
 
-These are passed directly to the vLLM server. Edit `docker-compose.yml` to change them.
+These are passed directly to the vLLM server. Edit `docker-compose.yaml` to change them.
 
 | Flag | Default | Description |
 |---|---|---|
@@ -172,7 +172,7 @@ Controlled via environment variables injected by Docker Compose:
 | `LLM_BASE_URL` | `http://127.0.0.1:8001` | URL of the vLLM server (use service name inside Docker) |
 | `LLM_MODEL` | `Qwen/Qwen3-32B` | Model name sent in every completion request |
 
-> **Note:** `LLM_MODEL` in `docker-compose.yml` overrides the default in `llm.py`. Always set it in `docker-compose.yml` or `.env`.
+> **Note:** `LLM_MODEL` in `docker-compose.yaml` overrides the default in `llm.py`. Always set it in `docker-compose.yaml` or `.env`.
 
 ### Per-Request Parameters (API)
 
@@ -389,7 +389,7 @@ git clone https://huggingface.co/Qwen/Qwen3-7B ~/.cache/huggingface/hub/Qwen3-7B
 MODEL_NAME=Qwen/Qwen3-7B
 ```
 
-### 3. Update `docker-compose.yml`
+### 3. Update `docker-compose.yaml`
 
 - Change the `volumes` path: `~/.cache/huggingface/hub/Qwen3-7B:/model`
 - Change `--served-model-name` in the `command` block
@@ -439,7 +439,7 @@ HTTP_PROXY=http://your-proxy:8080
 HTTPS_PROXY=http://your-proxy:8080
 ```
 
-`run.sh` reads these and threads them through every step that needs them. Also update `docker-compose.yml` → `build.args` to keep the image build in sync.
+`run.sh` reads these and threads them through every step that needs them. Also update `docker-compose.yaml` → `build.args` to keep the image build in sync.
 
 ---
 
@@ -474,7 +474,7 @@ docker compose logs vllm
 ```
 
 Common causes:
-- Model path not found → check the volume mount in `docker-compose.yml` matches the actual download path
+- Model path not found → check the volume mount in `docker-compose.yaml` matches the actual download path
 - Not enough VRAM → reduce `--gpu-memory-utilization` or switch to a smaller model
 - NVIDIA runtime not installed → run `bash run.sh` and answer **y** when prompted to install the toolkit
 
@@ -497,7 +497,7 @@ docker run --rm --gpus all nvidia/cuda:12.0.0-base-ubuntu22.04 nvidia-smi
 
 ### Proxy errors during build
 
-Check that the proxy address in `docker-compose.yml` → `build.args` is reachable from the build host:
+Check that the proxy address in `docker-compose.yaml` → `build.args` is reachable from the build host:
 
 ```bash
 curl -x http://10.93.144.53:8080 https://pypi.org
@@ -505,4 +505,4 @@ curl -x http://10.93.144.53:8080 https://pypi.org
 
 ### Out of shared memory
 
-Increase `shm_size` in `docker-compose.yml` (default `16gb`). Required shared memory scales with the number of GPUs and the model size.
+Increase `shm_size` in `docker-compose.yaml` (default `16gb`). Required shared memory scales with the number of GPUs and the model size.
