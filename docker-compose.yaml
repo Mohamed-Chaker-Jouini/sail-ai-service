@@ -10,7 +10,7 @@ services:
       - "8000:8000"
     environment:
       LLM_BASE_URL: http://vllm:8001
-      LLM_MODEL: Qwen/Qwen3-32B
+      LLM_MODEL: Qwen/Qwen3-14B
     depends_on:
       vllm:
         condition: service_healthy
@@ -28,7 +28,7 @@ services:
       - HF_HUB_OFFLINE=1                      # ← no network calls at all
       - TRANSFORMERS_OFFLINE=1                 # ← same for transformers
     volumes:
-      - /home/ai/.cache/huggingface/hub/Qwen3-32B:/model  # ← local model, no download
+      - /home/ai/.cache/huggingface/hub/Qwen3-14B:/model  # ← local model, no download
     deploy:
       resources:
         reservations:
@@ -38,13 +38,14 @@ services:
               capabilities: [gpu]
     command: >
       --model /model
-      --served-model-name Qwen/Qwen3-32B
+      --served-model-name Qwen/Qwen3-14B
       --port 8001
-      --max-model-len 4096
+      --max-model-len 8192
       --reasoning-parser qwen3
       --enable-auto-tool-choice
       --tool-call-parser hermes
-      --gpu-memory-utilization 0.95
+      --gpu-memory-utilization 0.90
+      --dtype bfloat16
     healthcheck:
       test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
       interval: 30s
