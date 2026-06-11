@@ -45,12 +45,14 @@ services:
       --reasoning-parser qwen3
       --enable-auto-tool-choice
       --tool-call-parser hermes
-      --gpu-memory-utilization 0.82
+      --gpu-memory-utilization 0.75
       --dtype bfloat16
       --tensor-parallel-size 1
       --max-num-seqs 4
       --max-num-batched-tokens 16384
       --enforce-eager
+      --swap-space 32
+      --kv-cache-dtype auto
     healthcheck:
       test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
       interval: 30s
