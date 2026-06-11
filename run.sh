@@ -94,12 +94,12 @@ load_env() {
   fi
 
   # Apply defaults if not set
-  MODEL_NAME="${MODEL_NAME:-Qwen/Qwen3-14B}"
+  MODEL_NAME="${MODEL_NAME:-Qwen/Qwen3-14B-AWQ}"
   VLLM_PORT="${VLLM_PORT:-8001}"
   AI_API_PORT="${AI_API_PORT:-8000}"
 
   # Derive short model directory name (last path component)
-  MODEL_DIR_NAME="${MODEL_NAME##*/}"                    # e.g. Qwen3-14B
+  MODEL_DIR_NAME="${MODEL_NAME##*/}"                    # e.g. Qwen3-14B-AWQ
   MODEL_PATH="${HOME}/.cache/huggingface/hub/${MODEL_DIR_NAME}"
 }
 

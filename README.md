@@ -1,6 +1,6 @@
 # Local LLM API — vLLM + FastAPI Gateway
 
-> A self-hosted, GPU-accelerated AI API that runs **Qwen3-14B** locally via [vLLM](https://github.com/vllm-project/vllm), exposed through a lightweight **FastAPI** service. Designed for air-gapped or proxy-only environments with no model downloads at runtime.
+> A self-hosted, GPU-accelerated AI API that runs **Qwen3-14B-AWQ** locally via [vLLM](https://github.com/vllm-project/vllm), exposed through a lightweight **FastAPI** service. Designed for air-gapped or proxy-only environments with no model downloads at runtime.
 
 ---
 
@@ -27,7 +27,7 @@
 This is a self-hosted AI API gateway you can drop into any project. It:
 
 - Runs **entirely on-premise** — no cloud, no external API calls at inference time
-- Serves the [Qwen3-14B](https://huggingface.co/Qwen/Qwen3-14B) reasoning model through [vLLM](https://github.com/vllm-project/vllm)
+- Serves the [Qwen3-14B-AWQ](https://huggingface.co/Qwen/Qwen3-14B-AWQ) reasoning model through [vLLM](https://github.com/vllm-project/vllm)
 - Exposes a clean REST API (`/api/ai/chat`) for chat-style completions
 - Accepts an arbitrary `context` JSON object alongside user messages, injected verbatim into the system prompt
 - Supports corporate **HTTP proxies** at build time without leaking them into the final image
@@ -45,14 +45,14 @@ This is a self-hosted AI API gateway you can drop into any project. It:
 │   │   (FastAPI)         │──▶│   (vLLM OpenAI API)      │ │
 │   │   Port: 8000        │   │   Port: 8001             │ │
 │   │                     │   │                          │ │
-│   │  main.py            │   │  Model: Qwen3-14B        │ │
+│   │  main.py            │   │  Model: Qwen3-14B-AWQ        │ │
 │   │  llm.py             │   │  /model → host volume    │ │
 │   │  prompting.py       │   │  GPU: all NVIDIA         │ │
 │   └─────────────────────┘   └─────────────────────────┘ │
 │           ▲                          ▲                   │
 │           │ HTTP                     │ volume mount      │
 │      External                 ~/.cache/huggingface/      │
-│      Clients                    hub/Qwen3-14B/           │
+│      Clients                    hub/Qwen3-14B-AWQ/           │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -93,7 +93,7 @@ your-project/
 | Docker | 24.x+ | With Compose v2 plugin |
 | NVIDIA Driver | 535+ | Check with `nvidia-smi` |
 | NVIDIA Container Toolkit | Latest | See [GPU Setup](#gpu-setup-nvidia-container-toolkit) |
-| VRAM | 28 GB+ | Qwen3-14B in bfloat16 needs ~28 GB; two 16 GB cards work |
+| VRAM | 28 GB+ | Qwen3-14B-AWQ in bfloat16 needs ~28 GB; two 16 GB cards work |
 | RAM | 32 GB+ | vLLM loads model weights into system RAM before GPU |
 | Disk | 30 GB free | Model weights are ~28 GB |
 | CPU | Any x86_64 | No minimum; more cores = faster tokenisation |
@@ -134,7 +134,7 @@ All tuneable values live in `.env`. Docker Compose reads this file automatically
 # .env
 
 # ─── Model ────────────────────────────────────────────────
-MODEL_NAME=Qwen/Qwen3-14B       # HuggingFace model ID (also the served-model-name)
+MODEL_NAME=Qwen/Qwen3-14B-AWQ       # HuggingFace model ID (also the served-model-name)
 
 # ─── Ports ────────────────────────────────────────────────
 VLLM_PORT=8001                   # Internal vLLM OpenAI-compatible API port
@@ -154,7 +154,7 @@ These are passed directly to the vLLM server. Edit `docker-compose.yaml` to chan
 | Flag | Default | Description |
 |---|---|---|
 | `--model` | `/model` | Path inside the container to model weights |
-| `--served-model-name` | `Qwen/Qwen3-14B` | Model name clients must reference in requests |
+| `--served-model-name` | `Qwen/Qwen3-14B-AWQ` | Model name clients must reference in requests |
 | `--port` | `8001` | Internal port vLLM listens on |
 | `--max-model-len` | `8192` | Maximum context window in tokens |
 | `--reasoning-parser` | `qwen3` | Enables chain-of-thought reasoning extraction |
@@ -253,7 +253,7 @@ Returns the service status and active model.
 ```json
 {
   "status": "ok",
-  "model": "Qwen/Qwen3-14B",
+  "model": "Qwen/Qwen3-14B-AWQ",
   "llm_base_url": "http://vllm:8001",
   "time": "2025-06-10T08:00:00.000000+00:00"
 }
@@ -309,7 +309,7 @@ Send a conversation and receive an AI reply.
     "completion_tokens": 87,
     "total_tokens": 399
   },
-  "model": "Qwen/Qwen3-14B"
+  "model": "Qwen/Qwen3-14B-AWQ"
 }
 ```
 
@@ -340,7 +340,7 @@ The `api` service depends on `vllm` with `condition: service_healthy`. The healt
 
 | Host Path | Container Path | Service | Purpose |
 |---|---|---|---|
-| `~/.cache/huggingface/hub/Qwen3-14B` | `/model` | vllm | Model weights (read-only at runtime) |
+| `~/.cache/huggingface/hub/Qwen3-14B-AWQ` | `/model` | vllm | Model weights (read-only at runtime) |
 
 ### Shared Memory
 
@@ -413,7 +413,7 @@ docker compose up -d --build api
 | Model | VRAM (bfloat16) | Recommended `--gpu-memory-utilization` |
 |---|---|---|
 | Qwen3-7B | ~14 GB | 0.90 |
-| Qwen3-14B | ~28 GB | 0.90 |
+| Qwen3-14B-AWQ | ~28 GB | 0.90 |
 | Qwen3-32B | ~64 GB | 0.85–0.90 |
 
 ---

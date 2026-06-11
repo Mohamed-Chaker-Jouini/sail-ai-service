@@ -10,7 +10,7 @@ services:
       - "8000:8000"
     environment:
       LLM_BASE_URL: http://vllm:8001
-      LLM_MODEL: Qwen/Qwen3-14B
+      LLM_MODEL: Qwen/Qwen3-14B-AWQ
     depends_on:
       vllm:
         condition: service_healthy
@@ -29,7 +29,7 @@ services:
       - TRANSFORMERS_OFFLINE=1                 # ← same for transformers
       - CUDA_VISIBLE_DEVICES=0
     volumes:
-      - /home/ai/.cache/huggingface/hub/Qwen3-14B:/model  # ← local model, no download
+      - /home/ai/.cache/huggingface/hub/Qwen3-14B-AWQ:/model  # ← local model, no download
     deploy:
       resources:
         reservations:
@@ -39,7 +39,7 @@ services:
               capabilities: [gpu]
     command: >
       --model /model
-      --served-model-name Qwen/Qwen3-14B
+      --served-model-name Qwen/Qwen3-14B-AWQ-AWQ
       --port 8001
       --max-model-len 16384
       --reasoning-parser qwen3
