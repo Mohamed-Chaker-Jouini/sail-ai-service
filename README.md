@@ -105,7 +105,7 @@ your-project/
 ### 1. Clone the repo
 
 ```bash
-git clone <your-repo-url> llm-api
+git clone https://github.com/Mohamed-Chaker-Jouini/sail-ai-service.git llm-api
 cd llm-api
 ```
 
@@ -170,7 +170,7 @@ Controlled via environment variables injected by Docker Compose:
 | Variable | Default | Description |
 |---|---|---|
 | `LLM_BASE_URL` | `http://127.0.0.1:8001` | URL of the vLLM server (use service name inside Docker) |
-| `LLM_MODEL` | `Qwen/Qwen3-32B` | Model name sent in every completion request |
+| `LLM_MODEL` | `Qwen/Qwen3-14B` | Model name sent in every completion request |
 
 > **Note:** `LLM_MODEL` in `docker-compose.yaml` overrides the default in `llm.py`. Always set it in `docker-compose.yaml` or `.env`.
 
